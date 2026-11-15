@@ -1,0 +1,194 @@
+[
+  {
+    "id": 1,
+    "round_number": 1,
+    "card_code": "Card #01",
+    "title": "Fertilizer Runoff",
+    "icon": "🧪",
+    "threat_story": "Nutrients from lawns may wash into a pond and contribute to algae growth and oxygen problems.",
+    "threat_marker": "Fertilizer marker on lawn area",
+    "solution_piece": "Native buffer strip between lawn and pond",
+    "physical_instruction": "Remove fertilizer marker; attach native buffer strip between lawn and pond.",
+    "prediction": {
+      "prompt": "What might excess nutrients encourage?",
+      "choices": [
+        {"id": "A", "text": "More algae growth"},
+        {"id": "B", "text": "Water always gets colder"},
+        {"id": "C", "text": "Pollution disappears"}
+      ],
+      "correct_id": "A"
+    },
+    "action": {
+      "prompt": "Choose the best conservation response:",
+      "choices": [
+        {"id": "A", "text": "Add more fertilizer"},
+        {"id": "B", "text": "Reduce unnecessary fertilizer and protect a vegetated buffer"},
+        {"id": "C", "text": "Remove shoreline plants"}
+      ],
+      "correct_id": "B"
+    },
+    "science_explanation": "Vegetated buffers may slow runoff and retain some sediment and nutrients.",
+    "real_life_verification": "Compare nutrient tests and runoff observations over time; do not infer nutrients from water cloudiness.",
+    "demonstration_note": "Physical change demonstrates a conservation plan, not a guaranteed ecosystem recovery."
+  },
+  {
+    "id": 2,
+    "round_number": 2,
+    "card_code": "Card #02",
+    "title": "Invasive Plants",
+    "icon": "🌿",
+    "threat_story": "A suspected invasive wetland plant may outcompete native plants.",
+    "threat_marker": "Suspected-invasive plant token",
+    "solution_piece": "Native plant piece labeled 'planned after verification'",
+    "physical_instruction": "Remove suspected-invasive marker; add native plant piece labeled “planned after verification”.",
+    "prediction": {
+      "prompt": "What can some invasive plants do?",
+      "choices": [
+        {"id": "A", "text": "Always improve habitat"},
+        {"id": "B", "text": "Displace native vegetation"},
+        {"id": "C", "text": "Eliminate all runoff"}
+      ],
+      "correct_id": "B"
+    },
+    "action": {
+      "prompt": "Choose the best conservation response:",
+      "choices": [
+        {"id": "A", "text": "Spread the plant"},
+        {"id": "B", "text": "Remove all plants without checking"},
+        {"id": "C", "text": "Verify identification and follow approved management, then restore natives"}
+      ],
+      "correct_id": "C"
+    },
+    "science_explanation": "Appropriate management can reduce pressure on native plants, but identification and permissions matter.",
+    "real_life_verification": "Document plant identification and repeat vegetation surveys.",
+    "demonstration_note": "Physical change demonstrates a conservation plan, not a guaranteed ecosystem recovery."
+  },
+  {
+    "id": 3,
+    "round_number": 3,
+    "card_code": "Card #03",
+    "title": "Pollinator Habitat Decline",
+    "icon": "🌸",
+    "threat_story": "Few suitable native flowers are present near the pond.",
+    "threat_marker": "Missing flowers barren zone marker",
+    "solution_piece": "Flowering plant patch with bee/butterfly illustration tokens",
+    "physical_instruction": "Attach flowering plant patch and bee/butterfly illustration tokens.",
+    "prediction": {
+      "prompt": "What resource can native flowers provide?",
+      "choices": [
+        {"id": "A", "text": "Food for pollinators"},
+        {"id": "B", "text": "Plastic waste"},
+        {"id": "C", "text": "Extra road salt"}
+      ],
+      "correct_id": "A"
+    },
+    "action": {
+      "prompt": "Choose the best conservation response:",
+      "choices": [
+        {"id": "A", "text": "Add locally appropriate native flowers and nesting habitat"},
+        {"id": "B", "text": "Remove flowers"},
+        {"id": "C", "text": "Pave the flower patch"}
+      ],
+      "correct_id": "A"
+    },
+    "science_explanation": "Appropriate native flowers can provide nectar and pollen; nesting habitat also matters.",
+    "real_life_verification": "Observe pollinator visits at comparable times and weather.",
+    "demonstration_note": "Physical change demonstrates a conservation plan, not a guaranteed ecosystem recovery."
+  },
+  {
+    "id": 4,
+    "round_number": 4,
+    "card_code": "Card #04",
+    "title": "Pond Litter",
+    "icon": "🥤",
+    "threat_story": "Plastic litter is visible along the shoreline.",
+    "threat_marker": "Plastic litter debris tokens",
+    "solution_piece": "Covered waste bin and prevention education sign",
+    "physical_instruction": "Remove plastic litter tokens; attach waste bin and prevention sign.",
+    "prediction": {
+      "prompt": "How can litter affect wildlife?",
+      "choices": [
+        {"id": "A", "text": "It always creates habitat"},
+        {"id": "B", "text": "It may cause ingestion or entanglement"},
+        {"id": "C", "text": "It removes excess nutrients"}
+      ],
+      "correct_id": "B"
+    },
+    "action": {
+      "prompt": "Choose the best conservation response:",
+      "choices": [
+        {"id": "A", "text": "Push trash into water"},
+        {"id": "B", "text": "Safely remove litter and prevent new litter"},
+        {"id": "C", "text": "Leave it indefinitely"}
+      ],
+      "correct_id": "B"
+    },
+    "science_explanation": "Removing litter reduces exposure to harmful debris.",
+    "real_life_verification": "Count litter items before/after cleanup; use safe supervised procedures.",
+    "demonstration_note": "Physical change demonstrates a conservation plan, not a guaranteed ecosystem recovery."
+  },
+  {
+    "id": 5,
+    "round_number": 5,
+    "card_code": "Card #05",
+    "title": "Shoreline Habitat Loss",
+    "icon": "🐸",
+    "threat_story": "Vegetation was removed from part of the shoreline.",
+    "threat_marker": "Bare-shore panel marker",
+    "solution_piece": "Planted shore panel with frog shelter illustration",
+    "physical_instruction": "Swap bare-shore panel for planted shore; add frog shelter illustration.",
+    "prediction": {
+      "prompt": "What can shoreline plants provide?",
+      "choices": [
+        {"id": "A", "text": "Shelter and soil stabilization"},
+        {"id": "B", "text": "Guaranteed fish population increase"},
+        {"id": "C", "text": "More plastic litter"}
+      ],
+      "correct_id": "A"
+    },
+    "action": {
+      "prompt": "Choose the best conservation response:",
+      "choices": [
+        {"id": "A", "text": "Remove remaining plants"},
+        {"id": "B", "text": "Pave entire shore"},
+        {"id": "C", "text": "Restore suitable native grasses, sedges, and shrubs"}
+      ],
+      "correct_id": "C"
+    },
+    "science_explanation": "Native vegetation may stabilize soil and create shelter; wildlife presence must be observed, not assumed.",
+    "real_life_verification": "Compare erosion signs and repeat wildlife observations.",
+    "demonstration_note": "Physical change demonstrates a conservation plan, not a guaranteed ecosystem recovery."
+  },
+  {
+    "id": 6,
+    "round_number": 6,
+    "card_code": "Card #06",
+    "title": "Sediment Runoff",
+    "icon": "⛰️",
+    "threat_story": "Bare soil on a slope washes into the pond during rain.",
+    "threat_marker": "Exposed bare soil slope patch",
+    "solution_piece": "Planted / stabilized slope piece",
+    "physical_instruction": "Replace exposed slope patch with planted/stabilized slope piece.",
+    "prediction": {
+      "prompt": "What can suspended sediment do?",
+      "choices": [
+        {"id": "A", "text": "Always improve visibility"},
+        {"id": "B", "text": "Reduce light and cover some habitats"},
+        {"id": "C", "text": "Remove all algae"}
+      ],
+      "correct_id": "B"
+    },
+    "action": {
+      "prompt": "Choose the best conservation response:",
+      "choices": [
+        {"id": "A", "text": "Stabilize bare soil and manage runoff"},
+        {"id": "B", "text": "Expose more soil"},
+        {"id": "C", "text": "Channel muddy water straight into pond"}
+      ],
+      "correct_id": "A"
+    },
+    "science_explanation": "Stabilized soil may reduce erosion and suspended sediment entering water.",
+    "real_life_verification": "Compare equal-volume runoff from two model slopes; repeat tests.",
+    "demonstration_note": "Physical change demonstrates a conservation plan, not a guaranteed ecosystem recovery."
+  }
+]
