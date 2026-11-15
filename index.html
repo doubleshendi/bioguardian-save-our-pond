@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BioGuardian: Save Our Pond!</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --primary: #15803d;
+      --primary-dark: #166534;
+      --accent: #0284c7;
+      --warning: #f59e0b;
+      --surface: #ffffff;
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+    }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .mobile-frame {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+      position: relative;
+    }
+    .touch-btn {
+      min-height: 48px;
+      touch-action: manipulation;
+    }
+  </style>
+</head>
+<body class="antialiased">
+  <div class="mobile-frame">
+    <!-- Top Educational Disclaimer -->
+    <div class="bg-emerald-50 text-emerald-900 border-b border-emerald-200 px-4 py-2 text-xs font-medium flex items-center justify-between">
+      <span>🌱 <strong>Educational Prototype:</strong> Scores reflect game learning points, not measured real-world biodiversity.</span>
+    </div>
+
+    <!-- App Header & Navigation Bar -->
+    <header id="app-header" class="px-4 py-3 border-b border-slate-200 flex items-center justify-between bg-white sticky top-0 z-30">
+      <div class="flex items-center space-x-2">
+        <span class="text-2xl">🦆</span>
+        <div>
+          <h1 class="text-base font-bold leading-tight text-emerald-900">BioGuardian</h1>
+          <p class="text-xs text-slate-500 font-medium">Save Our Pond!</p>
+        </div>
+      </div>
+      <div id="header-stats" class="flex items-center space-x-2 hidden">
+        <div id="active-player-badge" class="bg-sky-100 text-sky-800 text-xs px-2 py-1 rounded-full font-semibold">Player 1</div>
+        <div id="active-score-badge" class="bg-emerald-700 text-white text-xs px-2.5 py-1 rounded-full font-bold">0 / 120</div>
+        <button onclick="navigate('S11_HELP')" class="text-slate-500 hover:text-slate-800 p-1 text-sm font-bold">❓</button>
+      </div>
+    </header>
+
+    <!-- Main Dynamic Screen Container -->
+    <main id="app-content" class="flex-1 p-4 overflow-y-auto">
+      <!-- Screens rendered via JavaScript -->
+    </main>
+
+    <!-- Footer Note -->
+    <footer class="p-3 text-center text-xs text-slate-400 border-t border-slate-100 bg-slate-50">
+      FLL Innovation Challenge Prototype &bull; BioGuardian: Save Our Pond
+    </footer>
+  </div>
+
+  <script>
+    // Canonical 6 Challenges Data Definition
+    const CHALLENGES = [
+      {
+        id: 1,
+        round: 1,
+        cardCode: "Card #01",
+        title: "Fertilizer Runoff",
+        icon: "🧪",
+        threatStory: "Nutrients from lawns may wash into a pond and contribute to algae growth and oxygen problems.",
+        threatMarker: "Fertilizer pellets marker on lawn",
+        solutionPiece: "Native buffer strip between lawn and pond",
+        physicalInstruction: "Remove fertilizer marker; attach native buffer strip between lawn and pond.",
+        prediction: {
+          prompt: "What might excess nutrients encourage?",
+          choices: [
+            { id: "A", text: "More algae growth" },
+            { id: "B", text: "Water always gets colder" },
+            { id: "C", text: "Pollution disappears" }
+          ],
+          correct: "A"
+        },
+        action: {
+          prompt: "Choose the best conservation response:",
+          choices: [
+            { id: "A", text: "Add more fertilizer" },
+            { id: "B", text: "Reduce unnecessary fertilizer and protect a vegetated buffer" },
+            { id: "C", text: "Remove shoreline plants" }
+          ],
+          correct: "B"
+        },
+        scienceExplanation: "Vegetated buffers may slow runoff and retain some sediment and nutrients.",
+        realLifeVerification: "Compare nutrient tests and runoff observations over time; do not infer nutrients from water cloudiness.",
+        pieceLabel: "Native Buffer Strip"
+      },
+      {
+        id: 2,
+        round: 2,
+        cardCode: "Card #02",
+        title: "Invasive Plants",
+        icon: "🌿",
+        threatStory: "A suspected invasive wetland plant may outcompete native plants.",
+        threatMarker: "Suspected-invasive plant token",
+        solutionPiece: "Native plant piece labeled 'planned after verification'",
+        physicalInstruction: "Remove suspected-invasive marker; add native plant piece labeled “planned after verification”.",
+        prediction: {
+          prompt: "What can some invasive plants do?",
+          choices: [
+            { id: "A", text: "Always improve habitat" },
+            { id: "B", text: "Displace native vegetation" },
+            { id: "C", text: "Eliminate all runoff" }
+          ],
+          correct: "B"
+        },
+        action: {
+          prompt: "Choose the best conservation response:",
+          choices: [
+            { id: "A", text: "Spread the plant" },
+            { id: "B", text: "Remove all plants without checking" },
+            { id: "C", text: "Verify identification and follow approved management, then restore natives" }
+          ],
+          correct: "C"
+        },
+        scienceExplanation: "Appropriate management can reduce pressure on native plants, but identification and permissions matter.",
+        realLifeVerification: "Document plant identification and repeat vegetation surveys.",
+        pieceLabel: "Native Species Piece"
+      },
+      {
+        id: 3,
+        round: 3,
+        cardCode: "Card #03",
+        title: "Pollinator Habitat Decline",
+        icon: "🌸",
+        threatStory: "Few suitable native flowers are present near the pond.",
+        threatMarker: "Barren lawn section without native wildflowers",
+        solutionPiece: "Flowering plant patch with bee/butterfly illustration tokens",
+        physicalInstruction: "Attach flowering plant patch and bee/butterfly illustration tokens.",
+        prediction: {
+          prompt: "What resource can native flowers provide?",
+          choices: [
+            { id: "A", text: "Food for pollinators" },
+            { id: "B", text: "Plastic waste" },
+            { id: "C", text: "Extra road salt" }
+          ],
+          correct: "A"
+        },
+        action: {
+          prompt: "Choose the best conservation response:",
+          choices: [
+            { id: "A", text: "Add locally appropriate native flowers and nesting habitat" },
+            { id: "B", text: "Remove flowers" },
+            { id: "C", text: "Pave the flower patch" }
+          ],
+          correct: "A"
+        },
+        scienceExplanation: "Appropriate native flowers can provide nectar and pollen; nesting habitat also matters.",
+        realLifeVerification: "Observe pollinator visits at comparable times and weather.",
+        pieceLabel: "Flowering Pollinator Patch"
+      },
+      {
+        id: 4,
+        round: 4,
+        cardCode: "Card #04",
+        title: "Pond Litter",
+        icon: "🥤",
+        threatStory: "Plastic litter is visible along the shoreline.",
+        threatMarker: "Plastic litter tokens along water edge",
+        solutionPiece: "Covered waste bin and prevention sign",
+        physicalInstruction: "Remove plastic litter tokens; attach waste bin and prevention sign.",
+        prediction: {
+          prompt: "How can litter affect wildlife?",
+          choices: [
+            { id: "A", text: "It always creates habitat" },
+            { id: "B", text: "It may cause ingestion or entanglement" },
+            { id: "C", text: "It removes excess nutrients" }
+          ],
+          correct: "B"
+        },
+        action: {
+          prompt: "Choose the best conservation response:",
+          choices: [
+            { id: "A", text: "Push trash into water" },
+            { id: "B", text: "Safely remove litter and prevent new litter" },
+            { id: "C", text: "Leave it indefinitely" }
+          ],
+          correct: "B"
+        },
+        scienceExplanation: "Removing litter reduces exposure to harmful debris.",
+        realLifeVerification: "Count litter items before/after cleanup; use safe supervised procedures.",
+        pieceLabel: "Waste Bin & Education Sign"
+      },
+      {
+        id: 5,
+        round: 5,
+        cardCode: "Card #05",
+        title: "Shoreline Habitat Loss",
+        icon: "🐸",
+        threatStory: "Vegetation was removed from part of the shoreline.",
+        threatMarker: "Bare-shore panel marker",
+        solutionPiece: "Planted shore panel with frog shelter illustration",
+        physicalInstruction: "Swap bare-shore panel for planted shore; add frog shelter illustration.",
+        prediction: {
+          prompt: "What can shoreline plants provide?",
+          choices: [
+            { id: "A", text: "Shelter and soil stabilization" },
+            { id: "B", text: "Guaranteed fish population increase" },
+            { id: "C", text: "More plastic litter" }
+          ],
+          correct: "A"
+        },
+        action: {
+          prompt: "Choose the best conservation response:",
+          choices: [
+            { id: "A", text: "Remove remaining plants" },
+            { id: "B", "text": "Pave entire shore" },
+            { id: "C", "text": "Restore suitable native grasses, sedges, and shrubs" }
+          ],
+          correct: "C"
+        },
+        scienceExplanation: "Native vegetation may stabilize soil and create shelter; wildlife presence must be observed, not assumed.",
+        realLifeVerification: "Compare erosion signs and repeat wildlife observations.",
+        pieceLabel: "Planted Shore & Frog Shelter"
+      },
+      {
+        id: 6,
+        round: 6,
+        cardCode: "Card #06",
+        title: "Sediment Runoff",
+        icon: "⛰️",
+        threatStory: "Bare soil on a slope washes into the pond during rain.",
+        threatMarker: "Exposed bare soil slope patch",
+        solutionPiece: "Planted / stabilized slope piece",
+        physicalInstruction: "Replace exposed slope patch with planted/stabilized slope piece.",
+        prediction: {
+          prompt: "What can suspended sediment do?",
+          choices: [
+            { id: "A", text: "Always improve visibility" },
+            { id: "B", text: "Reduce light and cover some habitats" },
+            { id: "C", text: "Remove all algae" }
+          ],
+          correct: "B"
+        },
+        action: {
+          prompt: "Choose the best conservation response:",
+          choices: [
+            { id: "A", text: "Stabilize bare soil and manage runoff" },
+            { id: "B", text: "Expose more soil" },
+            { id: "C", text: "Channel muddy water straight into pond" }
+          ],
+          correct: "A"
+        },
+        scienceExplanation: "Stabilized soil may reduce erosion and suspended sediment entering water.",
+        realLifeVerification: "Compare equal-volume runoff from two model slopes; repeat tests.",
+        pieceLabel: "Stabilized Slope Patch"
+      }
+    ];
+
+    // State management
+    let state = {
+      currentScreen: "S01_WELCOME",
+      prevScreen: "S01_WELCOME",
+      mode: "cooperative",
+      players: ["Player 1"],
+      activePlayerIdx: 0,
+      currentRoundIdx: 0,
+      roundResults: CHALLENGES.map((c, i) => ({
+        roundNumber: i + 1,
+        predictionAnswer: null,
+        predictionCorrect: 0,
+        actionAnswer: null,
+        actionCorrect: 0,
+        bestActionSelected: false,
+        explanationVerified: 0,
+        restorationConfirmed: false
+      }))
+    };
+
+    function saveState() {
+      try {
+        localStorage.setItem("bioguardian_mobile_state", JSON.stringify(state));
+      } catch (e) {}
+    }
+
+    function loadState() {
+      try {
+        const saved = localStorage.getItem("bioguardian_mobile_state");
+        if (saved) {
+          state = JSON.parse(saved);
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+
+    function calculateTotalScore() {
+      return state.roundResults.reduce((acc, r) => {
+        return acc + (r.predictionCorrect * 5) + (r.actionCorrect * 10) + (r.explanationVerified * 5);
+      }, 0);
+    }
+
+    function calculateRestorations() {
+      return state.roundResults.filter(r => r.restorationConfirmed).length;
+    }
+
+    function getActivePlayerName() {
+      if (!state.players || state.players.length === 0) return "Player 1";
+      return state.players[state.activePlayerIdx % state.players.length];
+    }
+
+    function navigate(screen) {
+      if (state.currentScreen !== "S11_HELP") {
+        state.prevScreen = state.currentScreen;
+      }
+      state.currentScreen = screen;
+      saveState();
+      render();
+    }
+
+    function navigateBack() {
+      state.currentScreen = state.prevScreen || "S04_DASHBOARD";
+      saveState();
+      render();
+    }
+
+    function updateHeader() {
+      const stats = document.getElementById("header-stats");
+      if (state.currentScreen === "S01_WELCOME" || state.currentScreen === "S02_SETUP") {
+        stats.classList.add("hidden");
+      } else {
+        stats.classList.remove("hidden");
+        document.getElementById("active-player-badge").innerText = `👤 ${getActivePlayerName()}`;
+        document.getElementById("active-score-badge").innerText = `⭐ ${calculateTotalScore()}/120`;
+      }
+    }
+
+    // Screens Rendering
+    function render() {
+      updateHeader();
+      const content = document.getElementById("app-content");
+      
+      switch (state.currentScreen) {
+        case "S01_WELCOME":
+          renderWelcome(content);
+          break;
+        case "S02_SETUP":
+          renderSetup(content);
+          break;
+        case "S03_INSTRUCTIONS":
+          renderInstructions(content);
+          break;
+        case "S04_DASHBOARD":
+          renderDashboard(content);
+          break;
+        case "S05_PREDICT":
+          renderPredict(content);
+          break;
+        case "S06_ACTION":
+          renderAction(content);
+          break;
+        case "S07_LEARN":
+          renderLearn(content);
+          break;
+        case "S08_RESTORE":
+          renderRestore(content);
+          break;
+        case "S09_ROUND_RESULT":
+          renderRoundResult(content);
+          break;
+        case "S10_FINAL_REPORT":
+          renderFinalReport(content);
+          break;
+        case "S11_HELP":
+          renderHelp(content);
+          break;
+        default:
+          renderWelcome(content);
+      }
+    }
+
+    function renderWelcome(el) {
+      const hasSaved = localStorage.getItem("bioguardian_mobile_state") !== null;
+      el.innerHTML = `
+        <div class="text-center py-6">
+          <div class="text-5xl mb-3">🦆 🌿 🌊</div>
+          <h2 class="text-2xl font-extrabold text-emerald-950 mb-1">BioGuardian</h2>
+          <p class="text-emerald-700 font-semibold mb-3">Save Our Pond!</p>
+          <p class="text-slate-600 text-sm leading-relaxed mb-6">
+            Tabletop habitat conservation game for FIRST LEGO League (FLL). Predict impacts, choose responses, explain the science, and restore the physical pond!
+          </p>
+
+          <div class="bg-sky-50 border border-sky-200 rounded-xl p-4 text-left mb-6 text-xs text-sky-950 space-y-2">
+            <div class="font-bold text-sky-900 text-sm">🎯 Mission Objective</div>
+            <div>&bull; <strong>6 Fixed Rounds:</strong> Fertilizer, Invasives, Pollinators, Litter, Shoreline, Sediment.</div>
+            <div>&bull; <strong>Winning Rule:</strong> Score &ge; 90 points AND complete &ge; 4 model restorations.</div>
+            <div>&bull; <strong>Scoring:</strong> 5 pts prediction, 10 pts action, 5 pts explanation.</div>
+          </div>
+
+          <div class="space-y-3">
+            <button onclick="navigate('S02_SETUP')" class="w-full bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-sm hover:bg-emerald-800 touch-btn">
+              🚀 Start New Game
+            </button>
+            <button onclick="navigate('S03_INSTRUCTIONS')" class="w-full bg-slate-100 text-slate-800 font-semibold py-3 px-4 rounded-xl border border-slate-300 hover:bg-slate-200 touch-btn">
+              📖 How to Play & Physical Rules
+            </button>
+            ${hasSaved ? `
+              <button onclick="loadState(); navigate('S04_DASHBOARD');" class="w-full bg-sky-50 text-sky-700 font-semibold py-2.5 px-4 rounded-xl border border-sky-200 hover:bg-sky-100 text-sm">
+                💾 Resume Saved Game
+              </button>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSetup(el) {
+      el.innerHTML = `
+        <div class="py-2">
+          <h2 class="text-xl font-bold text-slate-900 mb-1">⚙️ Game Setup</h2>
+          <p class="text-xs text-slate-500 mb-4">Choose team format. Nicknames only — no personal data stored.</p>
+
+          <div class="mb-4">
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Game Mode</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="setMode('cooperative')" id="mode-coop-btn" class="p-3 text-left border-2 rounded-xl text-xs font-semibold ${state.mode === 'cooperative' ? 'border-emerald-600 bg-emerald-50 text-emerald-950' : 'border-slate-200 bg-white text-slate-700'}">
+                <div class="font-bold text-sm mb-0.5">🤝 Cooperative</div>
+                <div>1–4 players share points and rotate turns.</div>
+              </button>
+              <button onclick="setMode('solo')" id="mode-solo-btn" class="p-3 text-left border-2 rounded-xl text-xs font-semibold ${state.mode === 'solo' ? 'border-emerald-600 bg-emerald-50 text-emerald-950' : 'border-slate-200 bg-white text-slate-700'}">
+                <div class="font-bold text-sm mb-0.5">👤 Solo</div>
+                <div>Single player decision maker.</div>
+              </button>
+            </div>
+          </div>
+
+          <div id="player-inputs-container" class="mb-6 space-y-3">
+            <!-- Rendered by updatePlayerInputs() -->
+          </div>
+
+          <div class="flex space-x-2">
+            <button onclick="navigate('S01_WELCOME')" class="w-1/3 bg-slate-100 text-slate-700 font-semibold py-3 px-4 rounded-xl border border-slate-300 touch-btn">
+              ⬅️ Back
+            </button>
+            <button onclick="startGame()" class="w-2/3 bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl hover:bg-emerald-800 touch-btn shadow-sm">
+              Start Conservation ➡️
+            </button>
+          </div>
+        </div>
+      `;
+      updatePlayerInputs();
+    }
+
+    function setMode(m) {
+      state.mode = m;
+      if (m === 'solo') {
+        state.players = [state.players[0] || 'Player 1'];
+      } else if (state.players.length === 1) {
+        state.players = [state.players[0] || 'Player 1', 'Player 2'];
+      }
+      renderSetup(document.getElementById('app-content'));
+    }
+
+    function updatePlayerInputs() {
+      const container = document.getElementById("player-inputs-container");
+      if (!container) return;
+      if (state.mode === 'solo') {
+        container.innerHTML = `
+          <label class="block text-xs font-bold text-slate-700 mb-1">Explorer Nickname</label>
+          <input id="input-p0" type="text" value="${state.players[0] || 'Player 1'}" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm" placeholder="Nickname">
+        `;
+      } else {
+        let html = `
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-xs font-bold text-slate-700 uppercase tracking-wider">Team Players (${state.players.length})</label>
+            <div class="space-x-1">
+              <button onclick="adjustPlayerCount(-1)" class="px-2 py-0.5 bg-slate-200 text-slate-700 rounded text-xs font-bold">-</button>
+              <button onclick="adjustPlayerCount(1)" class="px-2 py-0.5 bg-slate-200 text-slate-700 rounded text-xs font-bold">+</button>
+            </div>
+          </div>
+        `;
+        state.players.forEach((p, idx) => {
+          html += `
+            <div class="flex items-center space-x-2">
+              <span class="text-xs font-bold text-slate-400 w-16">Player ${idx + 1}:</span>
+              <input id="input-p${idx}" type="text" value="${p}" class="flex-1 border border-slate-300 rounded-lg p-2 text-sm" placeholder="Player ${idx+1}">
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+      }
+    }
+
+    function adjustPlayerCount(delta) {
+      const newLen = Math.max(1, Math.min(4, state.players.length + delta));
+      if (newLen > state.players.length) {
+        state.players.push(`Player ${state.players.length + 1}`);
+      } else if (newLen < state.players.length) {
+        state.players.pop();
+      }
+      updatePlayerInputs();
+    }
+
+    function startGame() {
+      const inputs = document.querySelectorAll("#player-inputs-container input");
+      const names = [];
+      inputs.forEach((inp, idx) => {
+        const val = inp.value.trim();
+        names.push(val || `Player ${idx + 1}`);
+      });
+      state.players = names.length > 0 ? names : ["Player 1"];
+      state.activePlayerIdx = 0;
+      state.currentRoundIdx = 0;
+      state.roundResults = CHALLENGES.map((c, i) => ({
+        roundNumber: i + 1,
+        predictionAnswer: null,
+        predictionCorrect: 0,
+        actionAnswer: null,
+        actionCorrect: 0,
+        bestActionSelected: false,
+        explanationVerified: 0,
+        restorationConfirmed: false
+      }));
+      navigate("S03_INSTRUCTIONS");
+    }
+
+    function renderInstructions(el) {
+      el.innerHTML = `
+        <div class="py-2 space-y-4">
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Game Guide</div>
+          <h2 class="text-xl font-bold text-slate-900">📖 How to Play BioGuardian</h2>
+
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-xs text-amber-950 space-y-1.5">
+            <div class="font-bold text-amber-900">🧩 Tabletop Model Setup</div>
+            <div>&bull; Place all 6 problem markers in the physical model pond scene before starting.</div>
+            <div>&bull; Have the 6 solution pieces and 6 numbered challenge cards ready by the model.</div>
+          </div>
+
+          <div class="bg-white border border-slate-200 rounded-xl p-4 space-y-3 text-xs text-slate-700">
+            <div class="font-bold text-slate-900 text-sm">🔄 Each Round Follows 4 Steps:</div>
+            <div class="flex items-start space-x-2">
+              <span class="font-bold text-emerald-700">1.</span>
+              <div><strong>Predict Impact (+5 pts):</strong> Read threat story and choose the primary effect.</div>
+            </div>
+            <div class="flex items-start space-x-2">
+              <span class="font-bold text-emerald-700">2.</span>
+              <div><strong>Choose Action (+10 pts):</strong> Select the best response on your first try.</div>
+            </div>
+            <div class="flex items-start space-x-2">
+              <span class="font-bold text-emerald-700">3.</span>
+              <div><strong>Explain Science (+5 pts):</strong> Explain aloud why the action helps. Teammates verify your checklist.</div>
+            </div>
+            <div class="flex items-start space-x-2">
+              <span class="font-bold text-emerald-700">4.</span>
+              <div><strong>Physical Model Restoration:</strong> Swap the threat marker for the solution piece and tap "I changed the model"!</div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-lg text-emerald-950">
+              <div class="font-bold mb-1">🏆 Victory Condition</div>
+              <div>&bull; Score &ge; 90 / 120 pts</div>
+              <div>&bull; &ge; 4 / 6 Restorations</div>
+            </div>
+            <div class="bg-sky-50 border border-sky-200 p-3 rounded-lg text-sky-950">
+              <div class="font-bold mb-1">💡 Free Retry Rule</div>
+              <div>Wrong action first try = 0 pts, but retry unlocks physical model restoration!</div>
+            </div>
+          </div>
+
+          <div class="pt-2">
+            <button onclick="navigate('S04_DASHBOARD')" class="w-full bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl hover:bg-emerald-800 touch-btn shadow-sm">
+              Enter Pond Dashboard ➡️
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderDashboard(el) {
+      const score = calculateTotalScore();
+      const restores = calculateRestorations();
+      const currentRound = state.currentRoundIdx + 1;
+
+      let tilesHtml = "";
+      CHALLENGES.forEach((c, idx) => {
+        const rr = state.roundResults[idx];
+        const isRestored = rr.restorationConfirmed;
+        const isCurrent = idx === state.currentRoundIdx;
+        tilesHtml += `
+          <div class="p-3 rounded-xl border-2 transition-all ${isRestored ? 'bg-emerald-50 border-emerald-500' : isCurrent ? 'bg-amber-50 border-amber-500 ring-2 ring-amber-300' : 'bg-slate-50 border-slate-200 opacity-90'}">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-sm font-bold text-slate-800">${c.icon} ${c.cardCode}</span>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded-full ${isRestored ? 'bg-emerald-600 text-white' : 'bg-amber-100 text-amber-800'}">
+                ${isRestored ? '✅ Restored' : '⚠️ Active Threat'}
+              </span>
+            </div>
+            <div class="text-xs font-bold text-slate-900">${c.title}</div>
+            <div class="text-[11px] text-slate-500 truncate mt-0.5">${isRestored ? 'Piece Attached' : c.threatMarker}</div>
+          </div>
+        `;
+      });
+
+      el.innerHTML = `
+        <div class="py-1 space-y-4">
+          <!-- Top Dashboard Header -->
+          <div class="grid grid-cols-3 gap-2 text-center bg-slate-100 p-3 rounded-xl border border-slate-200">
+            <div>
+              <div class="text-[10px] uppercase font-bold text-slate-500">Progress</div>
+              <div class="text-base font-extrabold text-slate-800">Round ${currentRound}/6</div>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase font-bold text-slate-500">Team Score</div>
+              <div class="text-base font-extrabold text-emerald-700">${score}/120</div>
+            </div>
+            <div>
+              <div class="text-[10px] uppercase font-bold text-slate-500">Restored</div>
+              <div class="text-base font-extrabold text-sky-700">${restores}/6</div>
+            </div>
+          </div>
+
+          <!-- Active Turn Banner -->
+          <div class="bg-sky-50 border-l-4 border-sky-600 p-3 rounded-r-xl text-xs flex items-center justify-between">
+            <div>
+              <span class="text-slate-500">Active Decision Maker:</span>
+              <span class="font-bold text-sky-900 text-sm ml-1">${getActivePlayerName()}</span>
+            </div>
+            <button onclick="navigate('S11_HELP')" class="text-sky-700 font-bold hover:underline">Help & Docs</button>
+          </div>
+
+          <!-- 6 Habitat Scenarios Grid -->
+          <div class="space-y-2">
+            <div class="text-xs font-bold text-slate-700 uppercase tracking-wider">6 Habitat Scenarios & Tabletop Status</div>
+            <div class="grid grid-cols-2 gap-2">
+              ${tilesHtml}
+            </div>
+          </div>
+
+          <!-- Action Button -->
+          <div class="pt-2">
+            ${state.currentRoundIdx < 6 ? `
+              <button onclick="navigate('S05_PREDICT')" class="w-full bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-emerald-800 touch-btn shadow-md text-sm">
+                ▶️ Begin Round ${currentRound}: ${CHALLENGES[state.currentRoundIdx].title}
+              </button>
+            ` : `
+              <button onclick="navigate('S10_FINAL_REPORT')" class="w-full bg-emerald-800 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-emerald-900 touch-btn shadow-md text-sm">
+                🏆 View Final Team Report
+              </button>
+            `}
+          </div>
+
+          <!-- Restart Game -->
+          <div class="pt-1 text-center">
+            <button onclick="confirmReset()" class="text-xs text-rose-600 hover:text-rose-800 font-medium">
+              🔄 Reset / New Game
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function confirmReset() {
+      if (confirm("Reset current game session? All points and progress will restart.")) {
+        localStorage.removeItem("bioguardian_mobile_state");
+        state.currentScreen = "S01_WELCOME";
+        state.currentRoundIdx = 0;
+        state.roundResults = CHALLENGES.map((c, i) => ({
+          roundNumber: i + 1,
+          predictionAnswer: null,
+          predictionCorrect: 0,
+          actionAnswer: null,
+          actionCorrect: 0,
+          bestActionSelected: false,
+          explanationVerified: 0,
+          restorationConfirmed: false
+        }));
+        render();
+      }
+    }
+
+    function renderPredict(el) {
+      const challenge = CHALLENGES[state.currentRoundIdx];
+      const rr = state.roundResults[state.currentRoundIdx];
+      const isSubmitted = rr.predictionAnswer !== null;
+
+      let choicesHtml = "";
+      challenge.prediction.choices.forEach(c => {
+        const isChosen = rr.predictionAnswer === c.id;
+        const isCorrectChoice = challenge.prediction.correct === c.id;
+        let badge = "";
+        if (isSubmitted) {
+          if (isCorrectChoice) badge = "✅ (Correct)";
+          else if (isChosen) badge = "❌ (Your Choice)";
+        }
+        choicesHtml += `
+          <label class="block p-3 border-2 rounded-xl text-xs font-semibold cursor-pointer mb-2 transition-all ${isChosen ? 'border-emerald-600 bg-emerald-50 text-emerald-950' : 'border-slate-200 bg-white text-slate-800'}">
+            <input type="radio" name="pred_choice" value="${c.id}" ${isChosen ? 'checked' : ''} ${isSubmitted ? 'disabled' : ''} class="hidden">
+            <div class="flex items-center justify-between">
+              <div><span class="font-bold mr-1">${c.id}.</span> ${c.text}</div>
+              <span class="text-[11px] font-bold">${badge}</span>
+            </div>
+          </label>
+        `;
+      });
+
+      el.innerHTML = `
+        <div class="py-1 space-y-4">
+          <div class="flex items-center justify-between text-xs text-slate-500">
+            <span class="font-bold text-emerald-800">Round ${state.currentRoundIdx + 1} of 6</span>
+            <span>Step 1 of 4: Prediction</span>
+          </div>
+
+          <div class="bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs text-sky-950 flex items-center space-x-2">
+            <span class="text-xl">🃏</span>
+            <div>Take out physical <strong>${challenge.cardCode}: ${challenge.title}</strong> and check the pond scene.</div>
+          </div>
+
+          <div class="bg-red-50 border-l-4 border-red-500 p-3.5 rounded-r-xl">
+            <div class="text-xs font-bold text-red-800 uppercase tracking-wider mb-1">⚠️ Threat Scenario</div>
+            <p class="text-sm font-medium text-slate-800">${challenge.threatStory}</p>
+          </div>
+
+          <div>
+            <div class="text-xs font-bold text-slate-900 mb-2">❓ Prediction Challenge (+5 pts):</div>
+            <p class="text-xs text-slate-600 mb-3">${challenge.prediction.prompt}</p>
+            <div id="predict-choices-group">${choicesHtml}</div>
+          </div>
+
+          <div class="pt-2">
+            ${!isSubmitted ? `
+              <button onclick="submitPrediction()" class="w-full bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-emerald-800 touch-btn shadow-sm text-sm">
+                Submit Prediction (+5 pts)
+              </button>
+            ` : `
+              <div class="p-3 rounded-xl mb-3 text-xs ${rr.predictionCorrect ? 'bg-emerald-100 text-emerald-900 font-bold' : 'bg-amber-100 text-amber-900'}">
+                ${rr.predictionCorrect ? '🎉 Correct Prediction (+5 pts)!' : '🧐 Good Attempt (+0 pts). Primary effect: ' + challenge.prediction.choices.find(c => c.id === challenge.prediction.correct).text}
+              </div>
+              <button onclick="navigate('S06_ACTION')" class="w-full bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-emerald-800 touch-btn shadow-sm text-sm">
+                Next: Choose Conservation Action ➡️
+              </button>
+            `}
+          </div>
+        </div>
+      `;
+
+      if (!isSubmitted) {
+        document.querySelectorAll("input[name='pred_choice']").forEach(inp => {
+          inp.addEventListener("change", (e) => {
+            document.querySelectorAll("#predict-choices-group label").forEach(lbl => {
+              lbl.classList.remove("border-emerald-600", "bg-emerald-50", "text-emerald-950");
+              lbl.classList.add("border-slate-200", "bg-white", "text-slate-800");
+            });
+            e.target.closest("label").classList.add("border-emerald-600", "bg-emerald-50", "text-emerald-950");
+            e.target.closest("label").classList.remove("border-slate-200", "bg-white", "text-slate-800");
+          });
+        });
+      }
+    }
+
+    function submitPrediction() {
+      const selected = document.querySelector("input[name='pred_choice']:checked");
+      if (!selected) {
+        alert("Please select a prediction option first!");
+        return;
+      }
+      const challenge = CHALLENGES[state.currentRoundIdx];
+      const rr = state.roundResults[state.currentRoundIdx];
+      rr.predictionAnswer = selected.value;
+      rr.predictionCorrect = (selected.value === challenge.prediction.correct) ? 1 : 0;
+      saveState();
+      render();
+    }
+
+    function renderAction(el) {
+      const challenge = CHALLENGES[state.currentRoundIdx];
+      const rr = state.roundResults[state.currentRoundIdx];
+      const isSubmitted = rr.actionAnswer !== null;
+
+      let choicesHtml = "";
+      challenge.action.choices.forEach(c => {
+        const isChosen = rr.actionAnswer === c.id;
+        choicesHtml += `
+          <label class="block p-3 border-2 rounded-xl text-xs font-semibold cursor-pointer mb-2 transition-all ${isChosen ? 'border-emerald-600 bg-emerald-50 text-emerald-950' : 'border-slate-200 bg-white text-slate-800'}">
+            <input type="radio" name="act_choice" value="${c.id}" ${isChosen ? 'checked' : ''} ${isSubmitted ? 'disabled' : ''} class="hidden">
+            <div><span class="font-bold mr-1">${c.id}.</span> ${c.text}</div>
+          </label>
+        `;
+      });
+
+      el.innerHTML = `
+        <div class="py-1 space-y-4">
+          <div class="flex items-center justify-between text-xs text-slate-500">
+            <span class="font-bold text-emerald-800">Round ${state.currentRoundIdx + 1} of 6</span>
+            <span>Step 2 of 4: Action</span>
+          </div>
+
+          <div class="bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs text-sky-950">
+            👤 <strong>Decision Maker:</strong> ${getActivePlayerName()} leads the team in selecting the conservation response.
+          </div>
+
+          <div>
+            <div class="text-xs font-bold text-slate-900 mb-2">🛡️ Conservation Action Challenge (+10 pts):</div>
+            <p class="text-xs text-slate-600 mb-3">${challenge.action.prompt}</p>
+            <div id="action-choices-group">${choicesHtml}</div>
+          </div>
+
+          <div class="pt-2">
+            ${!isSubmitted ? `
+              <button onclick="submitAction()" class="w-full bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-emerald-800 touch-btn shadow-sm text-sm">
+                Submit Conservation Action (+10 pts)
+              </button>
+            ` : `
+              <div class="p-3 rounded-xl mb-3 text-xs ${rr.actionCorrect ? 'bg-emerald-100 text-emerald-900 font-bold' : 'bg-amber-100 text-amber-900'}">
+                ${rr.actionCorrect ? '🎉 Great Choice (+10 pts)!' : '🤔 Not the best action (0 pts on first try). You can retry in Step 3 to unlock model restoration!'}
+              </div>
+              <button onclick="navigate('S07_LEARN')" class="w-full bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-emerald-800 touch-btn shadow-sm text-sm">
+                Proceed to Science Explanation ➡️
+              </button>
+            `}
+          </div>
+        </div>
+      `;
+
+      if (!isSubmitted) {
+        document.querySelectorAll("input[name='act_choice']").forEach(inp => {
+          inp.addEventListener("change", (e) => {
+            document.querySelectorAll("#action-choices-group label").forEach(lbl => {
+              lbl.classList.remove("border-emerald-600", "bg-emerald-50", "text-emerald-950");
+              lbl.classList.add("border-slate-200", "bg-white", "text-slate-800");
+            });
+            e.target.closest("label").classList.add("border-emerald-600", "bg-emerald-50", "text-emerald-950");
+            e.target.closest("label").classList.remove("border-slate-200", "bg-white", "text-slate-800");
+          });
+        });
+      }
+    }
+
+    function submitAction() {
+      const selected = document.querySelector("input[name='act_choice']:checked");
+      if (!selected) {
+        alert("Please select a conservation response!");
+        return;
+      }
+      const challenge = CHALLENGES[state.currentRoundIdx];
+      const rr = state.roundResults[state.currentRoundIdx];
+      rr.actionAnswer = selected.value;
+      const isCorrect = (selected.value === challenge.action.correct);
+      rr.actionCorrect = isCorrect ? 1 : 0;
+      if (isCorrect) rr.bestActionSelected = true;
+      saveState();
+      render();
+    }
+
+    function renderLearn(el) {
+      const challenge = CHALLENGES[state.currentRoundIdx];
+      const rr = state.roundResults[state.currentRoundIdx];
+      const correctChoice = challenge.action.choices.find(c => c.id === challenge.action.correct);
+
+      let retryHtml = "";
+      if (!rr.bestActionSelected) {
+        let retryChoices = "";
+        challenge.action.choices.forEach(c => {
+          retryChoices += `
+            <label class="block p-2.5 border rounded-lg text-xs font-semibold cursor-pointer mb-1.5 bg-white">
+              <input type="radio" name="retry_choice" value="${c.id}" class="mr-1.5">
+              <span><strong>${c.id}.</strong> ${c.text}</span>
+            </label>
+          `;
+        });
+
+        retryHtml = `
+          <div class="bg-amber-50 border-2 border-amber-400 rounded-xl p-3.5 space-y-2">
+            <div class="text-xs font-bold text-amber-900 uppercase">🔄 Action Retry (Unlocks Model Change)</div>
+            <p class="text-xs text-amber-800">First-attempt score (0 pts) is preserved. Select the recommended action now to unlock physical restoration:</p>
+            <div>${retryChoices}</div>
+            <button onclick="submitRetry()" class="w-full bg-amber-700 text-white font-bold py-2 rounded-lg text-xs hover:bg-amber-800">
+              Confirm Retry Selection
+            </button>
+          </div>
+        `;
+      }
+
+      el.innerHTML = `
+        <div class="py-1 space-y-4">
+          <div class="flex items-center justify-between text-xs text-slate-500">
+            <span class="font-bold text-emerald-800">Round ${state.currentRoundIdx + 1} of 6</span>
+            <span>Step 3 of 4: Learn & Explain</span>
+          </div>
+
+          <div class="bg-emerald-50 border-l-4 border-emerald-600 p-3.5 rounded-r-xl space-y-2">
+            <div class="text-xs font-bold text-emerald-900 uppercase tracking-wider">🌱 Recommended Action: ${correctChoice.id}. ${correctChoice.text}</div>
+            <p class="text-xs text-emerald-800 leading-relaxed font-medium"><strong>Scientific Mechanism:</strong> ${challenge.scienceExplanation}</p>
+          </div>
+
+          <div class="bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs text-sky-950">
+            <div class="font-bold text-sky-900 mb-1">🔍 Real-World Verification:</div>
+            <div>${challenge.realLifeVerification}</div>
+          </div>
+
+          <!-- Explanation Checklist -->
+          <div class="bg-white border border-slate-200 rounded-xl p-3.5 space-y-2">
+            <div class="text-xs font-bold text-slate-900">🗣️ Scientific Explanation (+5 pts):</div>
+            <p class="text-xs text-slate-600">Have ${getActivePlayerName()} explain aloud why this conservation action protects the pond habitat.</p>
+            <label class="flex items-center space-x-2 text-xs font-bold text-emerald-800 cursor-pointer p-2 bg-emerald-50 rounded-lg border border-emerald-200">
+              <input type="checkbox" id="explain-check" onchange="toggleExplanation(this.checked)" ${rr.explanationVerified ? 'checked' : ''} class="rounded text-emerald-600">
+              <span>✅ Verified: Explanation clearly describes the ecological mechanism (+5 pts)</span>
+            </label>
+          </div>
+
+          ${retryHtml}
+
+          <div class="pt-2">
+            ${rr.bestActionSelected ? `
+              <button onclick="navigate('S08_RESTORE')" class="w-full bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-emerald-800 touch-btn shadow-sm text-sm">
+                Proceed to Model Restoration ➡️
+              </button>
+            ` : `
+              <div class="p-3 bg-slate-100 text-slate-600 rounded-xl text-center text-xs font-semibold">
+                🔒 Tabletop restoration locked. Select the correct action in the retry box above to proceed.
+              </div>
+            `}
+          </div>
+        </div>
+      `;
+    }
+
+    function toggleExplanation(val) {
+      state.roundResults[state.currentRoundIdx].explanationVerified = val ? 1 : 0;
+      saveState();
+      updateHeader();
+    }
+
+    function submitRetry() {
+      const selected = document.querySelector("input[name='retry_choice']:checked");
+      if (!selected) {
+        alert("Please select a retry action!");
+        return;
+      }
+      const challenge = CHALLENGES[state.currentRoundIdx];
+      const rr = state.roundResults[state.currentRoundIdx];
+      if (selected.value === challenge.action.correct) {
+        rr.bestActionSelected = true;
+        saveState();
+        render();
+      } else {
+        alert("Not the recommended action. Review the science card above!");
+      }
+    }
+
+    function renderRestore(el) {
+      const challenge = CHALLENGES[state.currentRoundIdx];
+      const rr = state.roundResults[state.currentRoundIdx];
+
+      el.innerHTML = `
+        <div class="py-1 space-y-4">
+          <div class="flex items-center justify-between text-xs text-slate-500">
+            <span class="font-bold text-emerald-800">Round ${state.currentRoundIdx + 1} of 6</span>
+            <span>Step 4 of 4: Physical Restoration</span>
+          </div>
+
+          <div class="bg-purple-50 border-2 border-dashed border-purple-300 rounded-xl p-4 text-xs text-purple-950 space-y-3">
+            <div class="text-sm font-bold text-purple-900">🛠️ Physical Tabletop Instructions</div>
+            <div class="space-y-1.5">
+              <div><strong>1. Remove Problem Marker:</strong> <span class="bg-red-100 text-red-800 px-2 py-0.5 rounded font-bold">${challenge.threatMarker}</span></div>
+              <div><strong>2. Attach Solution Piece:</strong> <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">${challenge.solutionPiece}</span></div>
+            </div>
+            <div class="p-2.5 bg-white rounded-lg border border-purple-200 italic text-purple-900">
+              &ldquo;${challenge.physicalInstruction}&rdquo;
+            </div>
+          </div>
+
+          <div class="bg-sky-50 border-l-4 border-sky-500 p-3 rounded-r-xl text-xs text-sky-900">
+            💡 <strong>Demonstration Note:</strong> Modifying the model illustrates a <em>planned conservation intervention</em>. In real life, ecological recovery requires long-term seasonal monitoring.
+          </div>
+
+          <div class="pt-2">
+            ${!rr.restorationConfirmed ? `
+              <button onclick="confirmModelChange()" class="w-full bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-emerald-800 touch-btn shadow-md text-sm">
+                ✅ I Changed the Model!
+              </button>
+            ` : `
+              <div class="p-3 bg-emerald-100 text-emerald-900 rounded-xl text-center text-xs font-bold mb-3">
+                🎉 Tabletop Restoration Confirmed! Piece Attached.
+              </div>
+              <button onclick="navigate('S09_ROUND_RESULT')" class="w-full bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-emerald-800 touch-btn shadow-md text-sm">
+                View Round Scorecard ➡️
+              </button>
+            `}
+          </div>
+        </div>
+      `;
+    }
+
+    function confirmModelChange() {
+      state.roundResults[state.currentRoundIdx].restorationConfirmed = true;
+      saveState();
+      render();
+    }
+
+    function renderRoundResult(el) {
+      const challenge = CHALLENGES[state.currentRoundIdx];
+      const rr = state.roundResults[state.currentRoundIdx];
+      const predPts = rr.predictionCorrect * 5;
+      const actPts = rr.actionCorrect * 10;
+      const expPts = rr.explanationVerified * 5;
+      const roundTotal = predPts + actPts + expPts;
+      const isLast = state.currentRoundIdx === 5;
+
+      el.innerHTML = `
+        <div class="py-1 space-y-4">
+          <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Round ${state.currentRoundIdx + 1} Complete</div>
+          <h2 class="text-xl font-bold text-slate-900">${challenge.icon} ${challenge.title} Scorecard</h2>
+
+          <div class="bg-white border border-slate-200 rounded-xl p-4 space-y-3">
+            <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+              <span class="text-xs text-slate-500">Decision Maker: <strong>${getActivePlayerName()}</strong></span>
+              <span class="bg-emerald-700 text-white text-xs font-bold px-2.5 py-1 rounded-full">+${roundTotal} / 20 pts</span>
+            </div>
+
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between">
+                <span>🔮 Prediction (First Try):</span>
+                <span class="font-bold">${predPts} pts ${predPts ? '✅' : '❌'}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>🛡️ Conservation Action (First Try):</span>
+                <span class="font-bold">${actPts} pts ${actPts ? '✅' : '❌'}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>🗣️ Science Explanation Verified:</span>
+                <span class="font-bold">${expPts} pts ${expPts ? '✅' : '❌'}</span>
+              </div>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+              <span>Tabletop Model Restoration:</span>
+              <span class="font-bold ${rr.restorationConfirmed ? 'text-emerald-700' : 'text-amber-600'}">
+                ${rr.restorationConfirmed ? '✅ Demonstrated' : '❌ Not Confirmed'}
+              </span>
+            </div>
+          </div>
+
+          <div class="bg-slate-100 rounded-xl p-3 text-center text-xs">
+            <span class="text-slate-500">Cumulative Team Score:</span>
+            <div class="text-xl font-extrabold text-emerald-800">${calculateTotalScore()} / 120 pts</div>
+            <div class="text-slate-500 font-semibold">${calculateRestorations()} / 6 Restorations Completed</div>
+          </div>
+
+          <div class="pt-2">
+            <button onclick="advanceRound()" class="w-full bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-emerald-800 touch-btn shadow-md text-sm">
+              ${isLast ? '🏆 Complete Game & View Report' : `Advance to Round ${state.currentRoundIdx + 2} ➡️`}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function advanceRound() {
+      if (state.currentRoundIdx < 5) {
+        state.currentRoundIdx++;
+        if (state.mode === 'cooperative') {
+          state.activePlayerIdx++;
+        }
+        navigate("S04_DASHBOARD");
+      } else {
+        navigate("S10_FINAL_REPORT");
+      }
+    }
+
+    function renderFinalReport(el) {
+      const score = calculateTotalScore();
+      const restores = calculateRestorations();
+      const isWinner = (score >= 90 && restores >= 4);
+
+      let rowsHtml = "";
+      CHALLENGES.forEach((c, idx) => {
+        const rr = state.roundResults[idx];
+        const pPts = rr.predictionCorrect * 5;
+        const aPts = rr.actionCorrect * 10;
+        const ePts = rr.explanationVerified * 5;
+        const tot = pPts + aPts + ePts;
+        rowsHtml += `
+          <tr class="border-b border-slate-100 text-xs">
+            <td class="py-2 font-bold">${c.cardCode}</td>
+            <td class="py-2">${c.title}</td>
+            <td class="py-2">${tot}/20</td>
+            <td class="py-2">${rr.restorationConfirmed ? '✅' : '❌'}</td>
+          </tr>
+        `;
+      });
+
+      el.innerHTML = `
+        <div class="py-1 space-y-4">
+          <!-- Final Outcome Banner -->
+          <div class="p-5 rounded-2xl text-center text-white ${isWinner ? 'bg-gradient-to-br from-emerald-700 to-green-800' : 'bg-gradient-to-br from-amber-600 to-yellow-700'} shadow-lg">
+            <div class="text-4xl mb-2">${isWinner ? '🌟 🦆 🌿' : '🌱 📖 💡'}</div>
+            <h2 class="text-xl font-extrabold mb-1">${isWinner ? 'Team Victory! Pond Habitat Stewards' : 'Keep Learning! Pond Care in Progress'}</h2>
+            <p class="text-xs font-medium opacity-90 mb-3">
+              ${isWinner 
+                ? `You reached ${score}/120 points and completed ${restores}/6 physical restorations!`
+                : `You scored ${score}/120 points and completed ${restores}/6 restorations. (Goal: 90+ pts & 4+ restorations).`}
+            </p>
+            <div class="inline-block bg-white/20 px-3 py-1 rounded-full text-xs font-bold">
+              ${isWinner ? 'Qualified for FLL Environmental Excellence' : 'Encouraging Step: Review buffer & erosion mechanisms!'}
+            </div>
+          </div>
+
+          <!-- Scorecard Table -->
+          <div class="bg-white border border-slate-200 rounded-xl p-3.5 space-y-2">
+            <div class="text-xs font-bold text-slate-900 uppercase tracking-wider">6-Round Score Summary</div>
+            <table class="w-full text-left">
+              <thead>
+                <tr class="text-[11px] text-slate-400 border-b border-slate-200">
+                  <th class="pb-1">Card</th>
+                  <th class="pb-1">Scenario</th>
+                  <th class="pb-1">Points</th>
+                  <th class="pb-1">Restored</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rowsHtml}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Key Learnings -->
+          <div class="bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-700 space-y-1.5">
+            <div class="font-bold text-slate-900 text-sm">🔬 Core Conservation Takeaways</div>
+            <div>&bull; <strong>Buffers:</strong> Native shoreline strips filter runoff and capture nutrients.</div>
+            <div>&bull; <strong>Invasives:</strong> Verify identification before removal; replant with native sedges.</div>
+            <div>&bull; <strong>Erosion:</strong> Stabilized root systems hold soils and prevent suffocating sediment plumes.</div>
+          </div>
+
+          <div class="space-y-2 pt-2">
+            <button onclick="confirmReset()" class="w-full bg-emerald-700 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-emerald-800 touch-btn shadow-md text-sm">
+              🔄 Play Another Game
+            </button>
+            <button onclick="window.print()" class="w-full bg-slate-100 text-slate-700 font-semibold py-2.5 px-4 rounded-xl border border-slate-300 text-xs">
+              🖨️ Print Score Report
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderHelp(el) {
+      el.innerHTML = `
+        <div class="py-1 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-bold text-slate-900">❓ Help & Glossary</h2>
+            <button onclick="navigateBack()" class="text-xs font-bold text-emerald-700 hover:underline">⬅️ Back</button>
+          </div>
+
+          <div class="bg-white border border-slate-200 rounded-xl p-3.5 space-y-2 text-xs text-slate-700">
+            <div class="font-bold text-slate-900">📚 Ecological Terms</div>
+            <div>&bull; <strong>Buffer Strip:</strong> Vegetation border that filters runoff before water enters the pond.</div>
+            <div>&bull; <strong>Runoff:</strong> Rainwater carrying surface pollutants into ponds.</div>
+            <div>&bull; <strong>Suspended Sediment:</strong> Murky floating dirt that blocks sunlight for aquatic plants.</div>
+          </div>
+
+          <div class="bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs text-sky-950 space-y-1">
+            <div class="font-bold text-sky-900">🔬 Scientific Honesty Note</div>
+            <div>All points are educational game points. Real ecological restoration requires prolonged water monitoring and biological surveys.</div>
+          </div>
+
+          <div class="pt-2">
+            <button onclick="navigateBack()" class="w-full bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl touch-btn">
+              ⬅️ Return to Previous Screen
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    // Initialize application
+    window.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      render();
+    });
+  </script>
+</body>
+</html>
